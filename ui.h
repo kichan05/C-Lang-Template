@@ -15,15 +15,10 @@ enum CURSOR_TYPE { HIDE, UNDERBAR, BLOCK };
 int getWindowWidth();
 int getWindowHeight();
 
-void gotoxy(int x, int y);
-void movexy(int x, int y);
 int currentX();
 int currentY();
 
 void setCursor(enum CURSOR_TYPE curType);
-
-void printCenter(char *fmp, ...);
-
 
 void initScreen();
 void clearScreen();
