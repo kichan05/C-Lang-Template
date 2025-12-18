@@ -2,8 +2,14 @@
 // Created by 바키찬 on 2025-10-13.
 //
 
+#include "common/color.h"
+#include <windows.h>
+#include <stdio.h>
 #include "ui.h"
 #include <stdarg.h>
+
+static HANDLE hBuffer[2];
+static int nScreenIndex = 0;
 
 int getWindowWidth() {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -76,4 +82,43 @@ void printCenter(char *fmp, ...) {
 
     gotoxy((width - stringLength) / 2, currentY());
     printf("%s", buffer);
+}
+
+void initScreen() {
+    for (int i = 0; i < 2; i++) {
+        hBuffer[i] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+
+        DWORD dwMode = 0;
+        GetConsoleMode(hBuffer[i], &dwMode);
+
+        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(hBuffer[i], dwMode);
+
+        CONSOLE_CURSOR_INFO cursorInfo = {1, FALSE};
+        SetConsoleCursorInfo(hBuffer[i], &cursorInfo);
+    }
+}
+
+void clearScreen() {
+    COORD coord = {0, 0};
+    DWORD dw;
+    FillConsoleOutputCharacter(hBuffer[nScreenIndex], ' ', 80 * 25, coord, &dw);
+}
+
+void writeScreen(int x, int y, char *text) {
+    COORD coord = {x, y};
+    DWORD dw;
+
+    SetConsoleCursorPosition(hBuffer[nScreenIndex], coord);
+    WriteConsole(hBuffer[nScreenIndex], text, strlen(text), &dw, NULL);
+}
+
+void flipScreen() {
+    SetConsoleActiveScreenBuffer(hBuffer[nScreenIndex]);
+    nScreenIndex = !nScreenIndex;
+}
+
+void releaseScreen() {
+    CloseHandle(hBuffer[0]);
+    CloseHandle(hBuffer[1]);
 }

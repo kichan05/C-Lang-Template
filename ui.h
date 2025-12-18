@@ -24,4 +24,12 @@ void setCursor(enum CURSOR_TYPE curType);
 
 void printCenter(char *fmp, ...);
 
+
+void initScreen();
+void clearScreen();
+void writeScreen(int x, int y, char *text);
+void flipScreen();
+void releaseScreen();
+
+
 #endif //C_UI_H
